@@ -11,8 +11,9 @@ on:
 jobs:
   generate:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout main
+      - name: Checkout main branch
         uses: actions/checkout@v4
 
       - name: Generate Snake SVG
@@ -27,7 +28,7 @@ jobs:
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git clone --single-branch --branch output https://github.com/${{ github.repository }} output
+          git clone --single-branch --branch output https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} output
           cp -r dist/* output/
           cd output
           git add .
