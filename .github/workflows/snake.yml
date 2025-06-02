@@ -2,7 +2,7 @@ name: Generate Snake
 
 on:
   schedule:
-    - cron: "0 0 * * *"  # Executa todo dia à meia-noite
+    - cron: "0 0 * * *"
   push:
     branches:
       - main
@@ -12,17 +12,26 @@ jobs:
   generate:
     runs-on: ubuntu-latest
     steps:
-      - uses: Platane/snk@v3
+      - name: Checkout main
+        uses: actions/checkout@v4
+
+      - name: Generate Snake SVG
+        uses: Platane/snk@v3
         with:
           github_user_name: tayalvess
           outputs: |
             dist/github-contribution-grid-snake.svg
             dist/github-contribution-grid-snake-dark.svg
 
-      - name: Push to the output branch
-        uses: crazy-max/ghaction-github-pages@v3
-        with:
-          target_branch: output
-          build_dir: dist
+      - name: Commit & Push to output branch
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git clone --single-branch --branch output https://github.com/${{ github.repository }} output
+          cp -r dist/* output/
+          cd output
+          git add .
+          git commit -m "generated snake svg"
+          git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
